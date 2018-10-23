@@ -1,0 +1,62 @@
+---
+title: "Create a Dynamic Projet Timeline on RStudio"
+author: "Lok Yiu"
+date: "`r format(Sys.Date())`"
+output:
+      html_document:
+        keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Create a Timeline on R
+This is an example of creating a timeline using the R script created by [Dean Attali](https://daattali.com/shiny/timevis-demo/) and the `timevis` package. I really like it as the script is very simple ad tidy. This is a great example for data scientists or analysts using our programming knowledge to make thing in the way we want (and without any additional cost to purchase other software)! 
+
+My approach is slightly different to Dean's one. I think making a task list on MS Excel is more handy than typing the task and dates directly into the script, in particular I know my list will grow dramatically in the future. Thus I have made a modification in this demo: Making a timeline by reading the a task list from a CSV file.
+
+My script can be found on [Github](https://github.com/lokyiu/lokyiu.github.io/blob/master/timeline.R) and you can download the timeline in the [html version](https://github.com/lokyiu/lokyiu.github.io/blob/master/Create%20a%20Dynamic%20Projet%20Timeline%20on%20RStudio.html)
+
+## Getting Start [Skip if you have RStudio installed on your computer]
+* To begin with the very first step is to install [RStudio](https://www.rstudio.com/), then install. Or you can follow the instructions created by [ayeimanolr](https://ayeimanol-r.net/2013/04/21/289/). Getting RStudio is free and easy. 
+
+```{r library, warning=FALSE,message=FALSE}
+# install.packages("timevis") # Remove the "#" in this line and run if you have not installed the packages
+library("timevis")
+```
+
+## Load Data
+As an example, you can download my example project task lists on Google drive:
+
+```{r google}
+id <- "1N7Nyi-u-mqAkQ8SmwsgK6D4QkGE0kOpK"
+dt <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id))
+print(dt)
+```
+
+## Prepare the task list
+I reformat 3 columns to make sure the date and task can displayed properly.
+
+```{r prepare}
+dt[dt==""] <- NA # Replace all blank to NA
+dt$start <- as.Date(as.character(dt$start), "%d/%m/%Y") # reformat the date field to my preferred format
+dt$end <- as.Date(as.character(dt$end), "%d/%m/%Y")
+dt$content <- as.character(dt$content) # formate the content as text characters
+```
+
+## Plot the Timeline
+Here is the exciting part. Simply run the following code and we will have a timeline. You can zoom in and out and drag horizontally to display the tasks. 
+
+```{r timeline1}
+timevis(dt, width = 900)
+```
+
+## Plot the Timeline with grouping
+You can also visualise tasks by groups. You can also download the .html file to view the timeline on Chrome/IE. I hope you enjoy this demo.
+
+```{r timeline2}
+groups = data.frame(id = 1:4, content = c("Outreaching", "System/Platform Changes", "Xmas Shutdown Period", "Key Milestone"))
+timevis(dt, groups, width = 900)
+```
+
